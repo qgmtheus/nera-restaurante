@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NERA · cucina italiana</title>
+  <meta name="description" content="Restaurante italiano contemporâneo — massas frescas, brasa e drinks autorais.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ================= HERO ================= -->
+  <header class="hero" id="inicio">
+    <div class="hero__media">
+      <div class="hero__slides" id="heroImages"></div>
+      <a href="#inicio" class="logo" aria-label="Início">
+        <span class="logo__mark">NE<br>RA</span>
+        <span class="logo__sub" data-setting="tagline">cucina italiana</span>
+      </a>
+      <ul class="social social--vertical" id="socialHero"></ul>
+    </div>
+
+    <div class="hero__panel">
+      <nav class="nav" id="nav">
+        <button class="nav__toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+        <ul class="nav__links" id="navLinks">
+          <li><a href="#cardapio" class="is-active">Cardápio</a></li>
+          <li><a href="#galeria">Galeria</a></li>
+          <li><a href="#avaliacoes">Avaliações</a></li>
+          <li><a href="#localizacao">Localização</a></li>
+          <li><a href="#contato">Contato</a></li>
+        </ul>
+        <button class="nav__search" id="searchOpen" aria-label="Buscar prato">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+        </button>
+      </nav>
+
+      <div class="hero__content" id="heroContent">
+        <p class="hero__kicker" id="heroKicker">Sim!</p>
+        <h1 class="hero__title" id="heroTitle">estamos<br>abertos!</h1>
+        <p class="hero__text" id="heroText"></p>
+        <a href="#cardapio" class="btn btn--outline" data-cta="hero-cardapio">Ver cardápio</a>
+      </div>
+
+      <span class="hero__vertical">#DELIVERYGRÁTIS</span>
+      <ol class="hero__dots" id="heroDots" aria-label="Slides"></ol>
+    </div>
+  </header>
+
+  <main>
+    <!-- ================= CARDÁPIO ================= -->
+    <section class="section section--dark" id="cardapio">
+      <div class="container">
+        <div class="section__head">
+          <p class="eyebrow">Nosso cardápio</p>
+          <h2 class="section__title">Feito à mão,<br>todos os dias.</h2>
+        </div>
+        <div class="filters" id="menuFilters" role="tablist"></div>
+        <div class="menu-grid" id="menuGrid"></div>
+      </div>
+    </section>
+
+    <!-- ================= GALERIA ================= -->
+    <section class="section section--gold" id="galeria">
+      <div class="container">
+        <div class="section__head section__head--row">
+          <div>
+            <p class="eyebrow">Galeria</p>
+            <h2 class="section__title">A casa por dentro.</h2>
+          </div>
+          <p class="section__lead">Clique nas fotos para ampliar. Use as setas do teclado para navegar.</p>
+        </div>
+        <div class="gallery" id="gallery"></div>
+      </div>
+    </section>
+
+    <!-- ================= AVALIAÇÕES ================= -->
+    <section class="section section--dark" id="avaliacoes">
+      <div class="container reviews">
+        <div class="reviews__summary">
+          <p class="eyebrow">O que dizem</p>
+          <h2 class="section__title">Avaliações</h2>
+          <div class="rating-big">
+            <strong id="ratingAvg">–</strong>
+            <div>
+              <div class="stars" id="ratingStars"></div>
+              <small id="ratingCount"></small>
+            </div>
+          </div>
+          <form class="card form" id="reviewForm" novalidate>
+            <h3>Deixe sua avaliação</h3>
+            <div class="star-input" id="starInput" role="radiogroup" aria-label="Nota"></div>
+            <input type="hidden" name="rating" id="ratingValue">
+            <label>Nome<input name="name" maxlength="60" required></label>
+            <label>Comentário<textarea name="text" rows="3" maxlength="600" required></textarea></label>
+            <button class="btn btn--gold" type="submit">Enviar avaliação</button>
+            <p class="form__status" role="status"></p>
+          </form>
+        </div>
+        <div class="reviews__list" id="reviewsList"></div>
+      </div>
+    </section>
+
+    <!-- ================= LOCALIZAÇÃO ================= -->
+    <section class="section section--darker" id="localizacao">
+      <div class="container location">
+        <div class="location__info">
+          <p class="eyebrow">Onde estamos</p>
+          <h2 class="section__title">Venha nos visitar.</h2>
+          <p class="location__address" data-setting="address"></p>
+          <ul class="hours" id="hours"></ul>
+          <div class="location__actions">
+            <a class="btn btn--gold" id="routeBtn" target="_blank" rel="noopener" data-cta="rota">Traçar rota</a>
+            <a class="btn btn--outline" id="callBtn" data-cta="ligar">Ligar</a>
+          </div>
+        </div>
+        <div class="location__map">
+          <iframe id="mapFrame" title="Mapa do restaurante" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CONTATO ================= -->
+    <section class="section section--dark" id="contato">
+      <div class="container contact">
+        <div>
+          <p class="eyebrow">Fale com a gente</p>
+          <h2 class="section__title">Dúvidas, reservas<br>ou eventos?</h2>
+          <p class="section__lead">Responderemos o mais rápido possível. Para algo urgente, chame no WhatsApp.</p>
+          <ul class="social" id="socialContact"></ul>
+        </div>
+        <form class="card form" id="contactForm" novalidate>
+          <div class="form__row">
+            <label>Nome*<input name="name" maxlength="80" required autocomplete="name"></label>
+            <label>Assunto
+              <select name="subject">
+                <option>Dúvida</option>
+                <option>Reserva</option>
+                <option>Evento privado</option>
+                <option>Delivery</option>
+                <option>Outro</option>
+              </select>
+            </label>
+          </div>
+          <div class="form__row">
+            <label>E-mail<input name="email" type="email" maxlength="120" autocomplete="email"></label>
+            <label>Telefone<input name="phone" type="tel" maxlength="30" autocomplete="tel"></label>
+          </div>
+          <label>Mensagem*<textarea name="text" rows="5" maxlength="1500" required></textarea></label>
+          <button class="btn btn--gold" type="submit">Enviar mensagem</button>
+          <p class="form__status" role="status"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <span class="footer__logo" data-setting="name">NERA</span>
+      <p>© <span id="year"></span> · Todos os direitos reservados</p>
+      <a href="/admin" class="footer__admin">Área do restaurante</a>
+    </div>
+  </footer>
+
+  <!-- WhatsApp flutuante -->
+  <a class="wa-float" id="waFloat" target="_blank" rel="noopener" aria-label="WhatsApp" data-cta="whatsapp-flutuante">
+    <svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 1-11.8 7l-4.2 1 1.1-4A8 8 0 1 1 20 12Z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 1c-1-.4-1.8-1.2-2.2-2.2l1-1-1-2L9 9.5Z"/></svg>
+  </a>
+
+  <!-- Modal de prato -->
+  <dialog class="modal" id="dishModal">
+    <button class="modal__close" data-close aria-label="Fechar">×</button>
+    <img class="modal__img" alt="">
+    <div class="modal__body">
+      <p class="eyebrow modal__cat"></p>
+      <h3 class="modal__title"></h3>
+      <p class="modal__desc"></p>
+      <div class="modal__tags"></div>
+      <div class="modal__foot">
+        <strong class="modal__price"></strong>
+        <a class="btn btn--gold modal__order" target="_blank" rel="noopener">Pedir no WhatsApp</a>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Lightbox -->
+  <dialog class="lightbox" id="lightbox">
+    <button class="lightbox__close" data-close aria-label="Fechar">×</button>
+    <button class="lightbox__nav lightbox__nav--prev" aria-label="Anterior">‹</button>
+    <figure><img alt=""><figcaption></figcaption></figure>
+    <button class="lightbox__nav lightbox__nav--next" aria-label="Próxima">›</button>
+  </dialog>
+
+  <!-- Busca -->
+  <dialog class="search" id="searchModal">
+    <input type="search" id="searchInput" placeholder="Buscar prato, ingrediente…" autocomplete="off">
+    <ul id="searchResults"></ul>
+  </dialog>
+
+  <script src="js/main.js" type="module"></script>
+</body>
+</html>
