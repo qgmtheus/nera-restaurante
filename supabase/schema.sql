@@ -135,9 +135,9 @@ begin
       select coalesce(jsonb_agg(jsonb_build_object('date', d::date, 'visits', coalesce(c, 0)) order by d), '[]')
       from generate_series((now() at time zone 'America/Sao_Paulo')::date - 13, (now() at time zone 'America/Sao_Paulo')::date, interval '1 day') d
       left join (
-        select (created_at at time zone 'America/Sao_Paulo')::date day, count(*) c
+        select (created_at at time zone 'America/Sao_Paulo')::date as dia, count(*) as c
         from nera.events where type = 'visit' group by 1
-      ) v on v.day = d::date),
+      ) v on v.dia = d::date),
     'clicks', (
       select coalesce(jsonb_object_agg(type || ':' || ref, c), '{}')
       from (select type, ref, count(*) c from nera.events where type <> 'visit' and ref is not null group by 1, 2) x),
