@@ -1,8 +1,8 @@
 # NERA · Landing page para restaurantes
 
-Landing page interativa com painel administrativo, feita com HTML, CSS e JavaScript puros + Supabase.
+Landing page interativa com painel administrativo, feita com HTML, CSS e JavaScript puros.
 
-**Demo:** https://nera-restaurante.vercel.app · **Painel:** https://nera-restaurante.vercel.app/admin → "Ver painel como visitante"
+**Demo:** https://nera-restaurante.vercel.app · **Painel:** https://nera-restaurante.vercel.app/admin
 
 ## Funcionalidades
 
@@ -17,18 +17,16 @@ Landing page interativa com painel administrativo, feita com HTML, CSS e JavaScr
 **Painel admin** (`/admin`)
 - Visitas dos últimos 14 dias, **pratos mais clicados**, fotos mais vistas e cliques em botões
 - Caixa de mensagens, moderação de avaliações e edição do cardápio (preço, destaque, ativo)
-- Conta de demonstração **somente leitura**, com contatos dos clientes mascarados
 
-## Arquitetura
+## Como funciona
 
-- `public/` — site estático publicado na Vercel
+É um **template de demonstração**: não tem login nem banco de dados. Cada visitante recebe dados de exemplo
+guardados no próprio navegador (`localStorage`), e tudo o que ele faz no site (abrir pratos, enviar mensagem,
+avaliar) aparece na hora no painel. O botão "Restaurar exemplo" no painel volta tudo ao início.
+
 - `public/js/config.js` — textos, contato, slides e galeria (troque aqui para outro restaurante)
-- `supabase/schema.sql` — tabelas, **Row Level Security** e funções (RPC) do schema `nera`
-- `supabase/seed.sql` — cardápio e avaliações iniciais
-- `supabase/demo-lock.sql` — impede que a conta demo troque senha/e-mail
-
-Segurança: o navegador usa apenas a chave pública; visitantes só conseguem **inserir** mensagens/avaliações
-(pendentes), eventos passam por uma função que valida o tipo, e somente o papel `owner` lê contatos ou altera dados.
+- `public/js/data.js` — cardápio e dados de exemplo do painel
+- `public/js/store.js` — "banco" local do template
 
 ## Rodar localmente
 

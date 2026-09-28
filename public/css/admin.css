@@ -39,9 +39,8 @@ input:focus { outline: none; border-color: var(--gold-2); }
 .login__or { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: .75rem; }
 .login__or::before, .login__or::after { content: ''; flex: 1; height: 1px; background: var(--line); }
 .login__hint { margin: -6px 0 0; color: var(--muted); font-size: .75rem; text-align: center; }
+.demo-banner a { color: #fff; font-weight: 600; margin-left: 6px; }
 .demo-banner { margin: 0 0 24px; padding: 11px 16px; border-radius: 9px; background: rgba(201, 162, 74, .12); border: 1px solid rgba(201, 162, 74, .35); color: #e8cf8f; font-size: .85rem; }
-.is-viewer .owner-only { display: none !important; }
-.is-viewer .table input { pointer-events: none; opacity: .6; }
 .login__back { color: var(--muted); font-size: .85rem; text-decoration: none; }
 
 /* ---------- Layout ---------- */
@@ -58,7 +57,7 @@ input:focus { outline: none; border-color: var(--gold-2); }
 .side__nav button.is-active { background: var(--panel-2); color: var(--text); }
 .side__nav button.is-active svg { color: var(--gold-2); }
 .pill { margin-left: auto; background: var(--gold); color: #fff; font-size: .7rem; font-weight: 800; padding: 2px 8px; border-radius: 999px; }
-.side__foot { margin-top: auto; display: flex; justify-content: space-between; padding: 0 12px; font-size: .85rem; }
+.side__foot { margin-top: auto; display: grid; gap: 10px; justify-items: start; padding: 0 12px; font-size: .85rem; }
 .side__foot a { color: var(--muted); text-decoration: none; }
 .side__foot button { background: none; border: 0; color: var(--muted); padding: 0; }
 .side__foot a:hover, .side__foot button:hover { color: var(--text); }
@@ -165,7 +164,7 @@ input:focus { outline: none; border-color: var(--gold-2); }
   .app { grid-template-columns: 1fr; }
   .side { position: sticky; top: 0; z-index: 10; height: auto; flex-direction: row; align-items: center; padding: 12px 16px; gap: 12px; overflow-x: auto; }
   .side .brand { display: none; }
-  .side__foot { margin: 0 0 0 auto; gap: 14px; white-space: nowrap; padding: 0; }
+  .side__foot { margin: 0 0 0 auto; display: flex; gap: 14px; white-space: nowrap; padding: 0; }
   .side__nav { display: flex; }
   .side__nav button { white-space: nowrap; padding: 9px 12px; }
   .main { padding: 24px 16px 60px; }

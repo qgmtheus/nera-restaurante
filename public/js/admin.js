@@ -1,6 +1,5 @@
-import { db } from './supabase.js';
+import { store } from './store.js';
 import { SITE } from './config.js';
-import { DEMO_EMAIL, DEMO_PASSWORD } from './env.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -19,18 +18,6 @@ const CTA_LABELS = {
   'social-whatsapp': 'WhatsApp (ícone)',
 };
 
-let role = null; // 'owner' | 'viewer'
-const isOwner = () => role === 'owner';
-
-async function must(promise) {
-  const { data, error } = await promise;
-  if (error) {
-    toast(error.message.includes('autorizado') ? 'Sem permissão' : 'Erro ao falar com o banco');
-    throw error;
-  }
-  return data;
-}
-
 function toast(msg) {
   const t = $('#toast');
   t.textContent = msg;
@@ -38,28 +25,6 @@ function toast(msg) {
   clearTimeout(toast.t);
   toast.t = setTimeout(() => t.classList.remove('show'), 2200);
 }
-
-// ---------- Login ----------
-async function signIn(email, password) {
-  $('#loginErr').textContent = '';
-  const { error } = await db.auth.signInWithPassword({ email, password });
-  if (error) { $('#loginErr').textContent = 'E-mail ou senha incorretos'; return; }
-  start();
-}
-$('#loginForm').addEventListener('submit', (e) => {
-  e.preventDefault();
-  signIn(e.target.email.value.trim(), e.target.password.value);
-});
-$('#demoLogin').addEventListener('click', () => signIn(DEMO_EMAIL, DEMO_PASSWORD));
-
-async function logout() {
-  await db.auth.signOut();
-  role = null;
-  clearInterval(refreshTimer);
-  $('#app').hidden = true;
-  $('#login').hidden = false;
-}
-$('#logout').addEventListener('click', logout);
 
 // ---------- Navegação ----------
 let currentView = 'dashboard';
@@ -74,26 +39,14 @@ function showView(v) {
   ({ dashboard: loadDashboard, messages: loadMessages, reviews: loadReviews, menu: loadMenu })[v]();
 }
 
-let refreshTimer;
-async function start() {
-  role = await must(db.rpc('role'));
-  if (!role) {
-    await db.auth.signOut();
-    $('#loginErr').textContent = 'Esta conta não tem acesso ao painel.';
-    return;
-  }
-  document.body.classList.toggle('is-viewer', !isOwner());
-  $('#demoBanner').hidden = isOwner();
-  $('#login').hidden = true;
-  $('#app').hidden = false;
-  showView('dashboard');
-  clearInterval(refreshTimer);
-  refreshTimer = setInterval(() => { if (currentView === 'dashboard') loadDashboard(); }, 15000);
-}
+// Atualiza o painel quando o site (aberto em outra aba) registra algo novo.
+window.addEventListener('storage', () => showView(currentView));
+window.addEventListener('focus', () => showView(currentView));
 
 // ---------- Dashboard ----------
-async function loadDashboard() {
-  const [d, menu] = await Promise.all([must(db.rpc('dashboard')), must(db.from('menu_items').select('id, name, category, image').order('sort'))]);
+function loadDashboard() {
+  const d = store.dashboard();
+  const menu = store.menu({ onlyActive: false });
   const clicks = (type, id) => d.clicks[`${type}:${id}`] || 0;
   const dishRanking = menu.map((x) => ({ ...x, clicks: clicks('dish', x.id) })).sort((a, b) => b.clicks - a.clicks);
   const galleryRanking = SITE.gallery.map((g) => ({ ...g, clicks: clicks('gallery', g.id) })).sort((a, b) => b.clicks - a.clicks);
@@ -153,9 +106,9 @@ function setBadge(sel, n) {
   el.textContent = n;
 }
 
-$('#resetStats').addEventListener('click', async () => {
+$('#resetStats').addEventListener('click', () => {
   if (!confirm('Zerar todas as estatísticas de visitas e cliques? Mensagens e avaliações não são apagadas.')) return;
-  await must(db.rpc('reset_stats'));
+  store.resetStats();
   toast('Estatísticas zeradas');
   loadDashboard();
 });
@@ -170,15 +123,15 @@ $('#msgFilter').addEventListener('click', (e) => {
   loadMessages();
 });
 
-async function loadMessages() {
-  const all = await must(db.rpc('list_messages'));
+function loadMessages() {
+  const all = store.messages();
   setBadge('#badgeMsgs', all.filter((m) => !m.read).length);
   const list = msgFilter === 'unread' ? all.filter((m) => !m.read) : all;
   $('#msgList').innerHTML = list.map((m) => {
-    const reply = m.email && isOwner()
+    const reply = m.email
       ? `<a href="mailto:${esc(m.email)}?subject=${encodeURIComponent(`Re: ${m.subject}`)}">Responder por e-mail</a>`
       : '';
-    const wa = m.phone && isOwner() ? `<a href="https://wa.me/${esc(m.phone.replace(/\D/g, ''))}" target="_blank" rel="noopener">WhatsApp</a>` : '';
+    const wa = m.phone ? `<a href="https://wa.me/${esc(m.phone.replace(/\D/g, ''))}" target="_blank" rel="noopener">WhatsApp</a>` : '';
     return `
     <article class="item ${m.read ? '' : 'unread'}" data-id="${esc(m.id)}" data-read="${m.read}">
       <div class="item__head">
@@ -186,7 +139,7 @@ async function loadMessages() {
         <span><span class="tag">${esc(m.subject)}</span> <span class="item__meta">${fmtDate(m.created_at)}</span></span>
       </div>
       <p class="item__text">${esc(m.text)}</p>
-      <div class="item__actions owner-only">
+      <div class="item__actions">
         ${reply}${wa}
         <button data-act="toggle">${m.read ? 'Marcar como não lida' : 'Marcar como lida'}</button>
         <button data-act="delete" class="danger">Excluir</button>
@@ -195,15 +148,15 @@ async function loadMessages() {
   }).join('') || '<p class="empty">Nenhuma mensagem por aqui.</p>';
 }
 
-$('#msgList').addEventListener('click', async (e) => {
+$('#msgList').addEventListener('click', (e) => {
   const b = e.target.closest('button[data-act]');
   if (!b) return;
   const item = b.closest('.item');
   const id = item.dataset.id;
   if (b.dataset.act === 'toggle') {
-    await must(db.from('messages').update({ read: item.dataset.read !== 'true' }).eq('id', id));
+    store.updateMessage(id, { read: item.dataset.read !== 'true' });
   } else if (confirm('Excluir esta mensagem?')) {
-    await must(db.from('messages').delete().eq('id', id));
+    store.deleteMessage(id);
     toast('Mensagem excluída');
   }
   loadMessages();
@@ -219,8 +172,8 @@ $('#revFilter').addEventListener('click', (e) => {
   loadReviews();
 });
 
-async function loadReviews() {
-  const all = await must(db.from('reviews').select('*').order('created_at', { ascending: false }));
+function loadReviews() {
+  const all = store.reviews();
   setBadge('#badgeReviews', all.filter((r) => !r.approved).length);
   const list = all.filter((r) => revFilter === 'all' || (revFilter === 'approved' ? r.approved : !r.approved));
   $('#revList').innerHTML = list.map((r) => `
@@ -230,32 +183,32 @@ async function loadReviews() {
         <span><span class="tag ${r.approved ? 'ok' : 'wait'}">${r.approved ? 'Publicada' : 'Pendente'}</span> <span class="item__meta">${fmtDate(r.created_at)}</span></span>
       </div>
       <p class="item__text">${esc(r.text)}</p>
-      <div class="item__actions owner-only">
+      <div class="item__actions">
         <button data-act="toggle">${r.approved ? 'Ocultar do site' : 'Aprovar e publicar'}</button>
         <button data-act="delete" class="danger">Excluir</button>
       </div>
     </article>`).join('') || `<p class="empty">Nenhuma avaliação ${revFilter === 'pending' ? 'pendente' : ''}.</p>`;
 }
 
-$('#revList').addEventListener('click', async (e) => {
+$('#revList').addEventListener('click', (e) => {
   const b = e.target.closest('button[data-act]');
   if (!b) return;
   const item = b.closest('.item');
   const id = item.dataset.id;
   if (b.dataset.act === 'toggle') {
     const approve = item.dataset.approved !== 'true';
-    await must(db.from('reviews').update({ approved: approve }).eq('id', id));
+    store.updateReview(id, { approved: approve });
     toast(approve ? 'Avaliação publicada' : 'Avaliação ocultada');
   } else if (confirm('Excluir esta avaliação?')) {
-    await must(db.from('reviews').delete().eq('id', id));
+    store.deleteReview(id);
     toast('Avaliação excluída');
   }
   loadReviews();
 });
 
 // ---------- Cardápio ----------
-async function loadMenu() {
-  const menu = await must(db.from('menu_items').select('*').order('sort'));
+function loadMenu() {
+  const menu = store.menu({ onlyActive: false });
   $('#menuTable tbody').innerHTML = menu.map((d) => `
     <tr data-id="${esc(d.id)}">
       <td><div class="dish-cell"><img src="${esc(d.image.replace('w=900', 'w=100'))}" alt="">${esc(d.name)}</div></td>
@@ -266,15 +219,21 @@ async function loadMenu() {
     </tr>`).join('');
 }
 
-$('#menuTable').addEventListener('change', async (e) => {
+$('#menuTable').addEventListener('change', (e) => {
   const input = e.target.closest('[data-field]');
-  if (!input || !isOwner()) return;
+  if (!input) return;
   const id = input.closest('tr').dataset.id;
   const value = input.type === 'checkbox' ? input.checked : Number(input.value);
-  await must(db.from('menu_items').update({ [input.dataset.field]: value }).eq('id', id));
+  store.updateMenuItem(id, { [input.dataset.field]: value });
   toast('Cardápio atualizado');
 });
 
+$('#resetAll').addEventListener('click', () => {
+  if (!confirm('Voltar todos os dados do painel para o exemplo inicial?')) return;
+  store.resetAll();
+  toast('Dados de exemplo restaurados');
+  showView(currentView);
+});
+
 // ---------- Boot ----------
-const { data: { session } } = await db.auth.getSession();
-if (session) start();
+showView('dashboard');

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
   <title>Painel · NERA</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2214%22 fill=%22%23121212%22/%3E%3Ctext x=%2232%22 y=%2243%22 font-family=%22Arial%22 font-weight=%22900%22 font-size=%2230%22 fill=%22%23c9a24a%22 text-anchor=%22middle%22%3EN%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -12,24 +13,8 @@
 </head>
 <body>
 
-  <!-- Login -->
-  <section class="login" id="login">
-    <form class="login__box" id="loginForm">
-      <span class="brand">NERA</span>
-      <h1>Área do restaurante</h1>
-      <label>E-mail<input type="email" name="email" autocomplete="username" required autofocus></label>
-      <label>Senha<input type="password" name="password" autocomplete="current-password" required></label>
-      <button class="btn" type="submit">Entrar</button>
-      <div class="login__or"><span>ou</span></div>
-      <button class="btn btn--ghost" type="button" id="demoLogin">Ver painel como visitante</button>
-      <p class="login__hint">Modo demonstração: somente leitura, contatos mascarados.</p>
-      <p class="login__err" id="loginErr" role="alert"></p>
-      <a href="/" class="login__back">← Voltar ao site</a>
-    </form>
-  </section>
-
   <!-- App -->
-  <div class="app" id="app" hidden>
+  <div class="app" id="app">
     <aside class="side">
       <span class="brand">NERA</span>
       <nav class="side__nav" id="sideNav">
@@ -52,20 +37,20 @@
       </nav>
       <div class="side__foot">
         <a href="/" target="_blank">Ver site ↗</a>
-        <button id="logout">Sair</button>
+        <button id="resetAll">Restaurar exemplo</button>
       </div>
     </aside>
 
     <main class="main">
-      <p class="demo-banner" id="demoBanner" hidden>Modo demonstração · você está vendo o painel como visitante (somente leitura).</p>
+      <p class="demo-banner">Painel de demonstração · tudo o que você fizer no site (cliques, mensagens, avaliações) aparece aqui. Os dados ficam só no seu navegador. <a href="/" target="_blank">Abrir o site ↗</a></p>
       <!-- Dashboard -->
       <section class="view is-active" data-view="dashboard">
         <header class="view__head">
           <div>
             <h1>Visão geral</h1>
-            <p class="muted">Atualiza sozinho a cada 15 segundos.</p>
+            <p class="muted">Dados de exemplo + tudo o que você fizer no site.</p>
           </div>
-          <button class="btn btn--ghost owner-only" id="resetStats">Zerar estatísticas</button>
+          <button class="btn btn--ghost" id="resetStats">Zerar estatísticas</button>
         </header>
 
         <div class="kpis" id="kpis"></div>

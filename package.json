@@ -2,7 +2,7 @@
   "name": "restaurante-landing",
   "version": "1.0.0",
   "private": true,
-  "description": "Landing page interativa para restaurantes com painel admin (Supabase)",
+  "description": "Template de landing page para restaurantes com painel de demonstração",
   "scripts": {
     "dev": "npx --yes serve public -l 3000"
   }

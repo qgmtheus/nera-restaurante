@@ -88,7 +88,7 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1
   transition: background .2s, transform .2s;
 }
 .social a:hover { background: var(--gold-2); transform: scale(1.08); }
-.social--vertical { position: absolute; z-index: 3; left: 22px; bottom: 30px; flex-direction: column; margin: 0; }
+.social--vertical { position: absolute; z-index: 3; left: 22px; bottom: 96px; flex-direction: column; margin: 0; }
 .social--vertical a { width: 26px; height: 26px; font-size: 13px; }
 
 .hero__panel {
@@ -269,6 +269,17 @@ svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1
 .footer__admin { text-decoration: underline; text-underline-offset: 3px; }
 .footer__admin:hover { color: var(--gold-2); }
 
+.demo-pill {
+  position: fixed; left: 22px; bottom: 22px; z-index: 50; display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 16px; border-radius: 999px; font-size: .8rem; color: #ddd8ce;
+  background: rgba(14, 14, 14, .82); backdrop-filter: blur(10px); border: 1px solid rgba(201, 162, 74, .45);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .35); transition: border-color .2s, transform .25s var(--ease);
+}
+.demo-pill strong { color: var(--gold-2); font-weight: 700; }
+.demo-pill:hover { border-color: var(--gold-2); transform: translateY(-2px); }
+.demo-pill__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold-2); box-shadow: 0 0 0 4px rgba(201, 162, 74, .2); animation: pulse 2s infinite; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 7px rgba(201, 162, 74, 0); } }
+@media (max-width: 560px) { .demo-pill { left: 12px; right: 84px; bottom: 26px; font-size: .72rem; padding: 9px 12px; } }
 .wa-float {
   position: fixed; right: 22px; bottom: 22px; z-index: 50; width: 56px; height: 56px; border-radius: 50%;
   display: grid; place-items: center; background: #25d366; color: #fff; font-size: 28px;

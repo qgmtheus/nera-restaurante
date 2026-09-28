@@ -1,4 +1,4 @@
-import { db } from './supabase.js';
+import { store } from './store.js';
 import { SITE } from './config.js';
 
 const $ = (s, el = document) => el.querySelector(s);
@@ -16,7 +16,7 @@ const ICONS = {
 
 // ---------- Analytics ----------
 function track(type, id) {
-  db.rpc('track', { p_type: type, p_ref: id ?? null }).then(() => {}, () => {});
+  store.track(type, id);
 }
 function trackVisitOnce() {
   try {
@@ -26,7 +26,7 @@ function trackVisitOnce() {
   track('visit');
 }
 
-// Parte fixa (config.js) renderiza na hora; cardápio e avaliações vêm do Supabase.
+// Parte fixa vem de config.js; cardápio e avaliações vêm do store (dados da demo no navegador).
 let site = {
   settings: SITE,
   gallery: SITE.gallery,
@@ -35,15 +35,10 @@ let site = {
   rating: { average: 0, count: 0 },
 };
 
-async function loadData() {
-  const [menu, reviews] = await Promise.all([
-    db.from('menu_items').select('*').eq('active', true).order('sort'),
-    db.from('reviews').select('name, text, rating, created_at').eq('approved', true).order('created_at', { ascending: false }),
-  ]);
-  if (menu.error) throw menu.error;
-  const approved = (reviews.data || []).map((r) => ({ ...r, createdAt: r.created_at }));
+function loadData() {
+  const approved = store.approvedReviews().map((r) => ({ ...r, createdAt: r.created_at }));
   const avg = approved.length ? approved.reduce((a, r) => a + r.rating, 0) / approved.length : 0;
-  site.menu = menu.data.map((d) => ({ ...d, price: Number(d.price) }));
+  site.menu = store.menu();
   site.reviews = approved.slice(0, 12);
   site.rating = { average: Number(avg.toFixed(1)), count: approved.length };
 }
@@ -64,13 +59,7 @@ async function init() {
   initReveal();
   $$('[data-cta]').forEach((el) => el.addEventListener('click', () => track('cta', el.dataset.cta)));
 
-  try {
-    await loadData();
-  } catch (err) {
-    console.error('Falha ao carregar dados do Supabase', err);
-    $('#menuGrid').innerHTML = '<p class="section__lead">Não foi possível carregar o cardápio agora. Tente recarregar a página.</p>';
-    return;
-  }
+  loadData();
   initMenu();
   renderReviews();
   trackVisitOnce();
@@ -259,9 +248,8 @@ function initReviewForm() {
   submitForm($('#reviewForm'), async (d) => {
     const rating = Number(d.rating);
     if (!d.name.trim() || !d.text.trim() || !(rating >= 1 && rating <= 5)) throw new Error('Informe nome, comentário e uma nota de 1 a 5.');
-    const { error } = await db.from('reviews').insert({ name: d.name.trim(), text: d.text.trim(), rating });
-    if (error) throw new Error('Não foi possível enviar agora. Tente novamente.');
-  }, 'Obrigado! Sua avaliação aparece após aprovação.', () => {
+    store.addReview({ name: d.name.trim(), text: d.text.trim(), rating });
+  }, 'Obrigado! Sua avaliação aparece após aprovação no painel.', () => {
     $('#ratingValue').value = '';
     paint(0);
   });
@@ -296,9 +284,8 @@ function initContactForm() {
       subject: d.subject, text: d.text.trim(),
     };
     if (!msg.name || !msg.text || (!msg.email && !msg.phone)) throw new Error('Preencha nome, mensagem e um contato (e-mail ou telefone).');
-    const { error } = await db.from('messages').insert(msg);
-    if (error) throw new Error('Não foi possível enviar agora. Tente novamente.');
-  }, 'Mensagem enviada! Em breve retornamos.');
+    store.addMessage(msg);
+  }, 'Mensagem enviada! Ela já aparece no painel do restaurante.');
 }
 
 function submitForm(form, send, okMsg, onOk) {
