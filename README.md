@@ -2,7 +2,7 @@
 
 Landing page interativa com painel administrativo, feita com HTML, CSS e JavaScript puros + Supabase.
 
-**Demo:** __NERA_URL__ · **Painel:** __NERA_URL__/admin → "Ver painel como visitante"
+**Demo:** https://nera-restaurante.vercel.app · **Painel:** https://nera-restaurante.vercel.app/admin → "Ver painel como visitante"
 
 ## Funcionalidades
 
